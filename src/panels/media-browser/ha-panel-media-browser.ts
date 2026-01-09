@@ -1,6 +1,7 @@
 import type { ActionDetail } from "@material/mwc-list";
 import {
   mdiAlphaABoxOutline,
+  mdiArrowLeft,
   mdiDotsVertical,
   mdiGrid,
   mdiListBoxOutline,
@@ -96,6 +97,7 @@ class PanelMediaBrowser extends LitElement {
           ? html`
               <ha-icon-button-arrow-prev
                 slot="navigationIcon"
+                .path=${mdiArrowLeft}
                 @click=${this._goBack}
               ></ha-icon-button-arrow-prev>
             `

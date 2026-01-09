@@ -19,10 +19,7 @@ import "../ha-combo-box-item";
 import "../ha-generic-picker";
 import type { HaGenericPicker } from "../ha-generic-picker";
 import "../ha-input-helper-text";
-import {
-  NO_ITEMS_AVAILABLE_ID,
-  type PickerComboBoxItem,
-} from "../ha-picker-combo-box";
+import type { PickerComboBoxItem } from "../ha-picker-combo-box";
 import "../ha-sortable";
 
 const HIDDEN_ATTRIBUTES = [
@@ -202,7 +199,11 @@ export class HaStateContentPicker extends LitElement {
         .value=${this._getPickerValue()}
         .getItems=${this._getFilteredItems}
         .getAdditionalItems=${this._getAdditionalItems}
-        .searchFn=${this._searchFn}
+        .notFoundLabel=${this.hass.localize("ui.components.combo-box.no_match")}
+        allow-custom-value
+        .customValueLabel=${this.hass.localize(
+          "ui.components.entity.entity-state-content-picker.custom_state"
+        )}
         @value-changed=${this._pickerValueChanged}
       >
         <div slot="field" class="container">
@@ -327,7 +328,7 @@ export class HaStateContentPicker extends LitElement {
     (text: string): PickerComboBoxItem => ({
       id: text,
       primary: this.hass.localize(
-        "ui.components.entity.entity-state-content-picker.custom_attribute"
+        "ui.components.entity.entity-state-content-picker.custom_state"
       ),
       secondary: `"${text}"`,
       search_labels: {
@@ -339,7 +340,10 @@ export class HaStateContentPicker extends LitElement {
     })
   );
 
-  private _getFilteredItems = (): PickerComboBoxItem[] => {
+  private _getFilteredItems = (
+    searchString?: string,
+    _section?: string
+  ): PickerComboBoxItem[] => {
     const stateObj = this.entityId
       ? this.hass.states[this.entityId]
       : undefined;
@@ -354,7 +358,11 @@ export class HaStateContentPicker extends LitElement {
     );
 
     // When editing an existing custom value, include it in the base items
-    if (currentValue && !items.find((item) => item.id === currentValue)) {
+    if (
+      currentValue &&
+      !items.find((item) => item.id === currentValue) &&
+      !searchString
+    ) {
       filteredItems.push(this._customValueOption(currentValue));
     }
 
@@ -364,32 +372,31 @@ export class HaStateContentPicker extends LitElement {
   private _getAdditionalItems = (
     searchString?: string
   ): PickerComboBoxItem[] => {
+    if (!searchString) {
+      return [];
+    }
+
+    const currentValue =
+      this._editIndex != null ? this._value[this._editIndex] : undefined;
+
+    // Don't add if it's the same as the current item being edited
+    if (currentValue && currentValue === searchString) {
+      return [];
+    }
+
+    // Check if the search string matches an existing item
     const stateObj = this.entityId
       ? this.hass.states[this.entityId]
       : undefined;
     const items = this._getItems(this.entityId, stateObj, this.allowName);
-
-    // If the search string does not match with the id of any of the items,
-    // offer to add it as a custom attribute
     const existingItem = items.find((item) => item.id === searchString);
-    if (searchString && !existingItem) {
+
+    // Only return custom value option if it doesn't match an existing item
+    if (!existingItem) {
       return [this._customValueOption(searchString)];
     }
 
     return [];
-  };
-
-  private _searchFn = (
-    search: string,
-    filteredItems: PickerComboBoxItem[],
-    _allItems: PickerComboBoxItem[]
-  ): PickerComboBoxItem[] => {
-    if (!search) {
-      return filteredItems;
-    }
-
-    // Always exclude NO_ITEMS_AVAILABLE_ID (since custom values are allowed) and currentValue (the custom value being edited)
-    return filteredItems.filter((item) => item.id !== NO_ITEMS_AVAILABLE_ID);
   };
 
   private async _moveItem(ev: CustomEvent) {

@@ -30,31 +30,36 @@ import {
 import { formatTime } from "../../../../../common/datetime/format_time";
 import type { ECOption } from "../../../../../resources/echarts/echarts";
 import { filterXSS } from "../../../../../common/util/xss";
-import type { StatisticPeriod } from "../../../../../data/recorder";
-import { getSuggestedPeriod } from "../../../../../data/energy";
 
-export function getSuggestedMax(period: StatisticPeriod, end: Date): number {
+export function getSuggestedMax(
+  dayDifference: number,
+  end: Date,
+  detailedDailyData = false
+): number {
   let suggestedMax = new Date(end);
 
-  if (period === "5minute") {
-    return suggestedMax.getTime();
-  }
-  suggestedMax.setMinutes(0, 0, 0);
-  if (period === "hour") {
-    return suggestedMax.getTime();
-  }
   // Sometimes around DST we get a time of 0:59 instead of 23:59 as expected.
   // Correct for this when showing days/months so we don't get an extra day.
-  if (suggestedMax.getHours() === 0) {
+  if (dayDifference > 2 && suggestedMax.getHours() === 0) {
     suggestedMax = subHours(suggestedMax, 1);
   }
-  suggestedMax.setHours(0);
-  if (period === "day" || period === "week") {
-    return suggestedMax.getTime();
+
+  if (!detailedDailyData) {
+    suggestedMax.setMinutes(0, 0, 0);
   }
-  // period === month
-  suggestedMax.setDate(1);
+  if (dayDifference > 35) {
+    suggestedMax.setDate(1);
+  }
+  if (dayDifference > 2) {
+    suggestedMax.setHours(0);
+  }
   return suggestedMax.getTime();
+}
+
+export function getSuggestedPeriod(
+  dayDifference: number
+): "month" | "day" | "hour" {
+  return dayDifference > 35 ? "month" : dayDifference > 2 ? "day" : "hour";
 }
 
 function createYAxisLabelFormatter(locale: FrontendLocaleData) {
@@ -91,10 +96,7 @@ export function getCommonOptions(
     xAxis: {
       type: "time",
       min: start,
-      max: getSuggestedMax(
-        getSuggestedPeriod(start, end, detailedDailyData),
-        end
-      ),
+      max: getSuggestedMax(dayDifference, end, detailedDailyData),
     },
     yAxis: {
       type: "value",

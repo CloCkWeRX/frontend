@@ -57,7 +57,6 @@ export class HaSlider extends Slider {
         #thumb {
           border: none;
           background-color: var(--ha-slider-thumb-color, var(--primary-color));
-          overflow: hidden;
         }
 
         #thumb:after {

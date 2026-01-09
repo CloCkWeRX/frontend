@@ -94,12 +94,10 @@ export class HuiCalendarCard extends LitElement implements LovelaceCard {
       (changedProps.has("_config") && this._config?.entities)
     ) {
       const computedStyles = getComputedStyle(this);
-      if (this._config?.entities) {
-        this._calendars = this._config.entities.map((entity, idx) => ({
-          entity_id: entity,
-          backgroundColor: getColorByIndex(idx, computedStyles),
-        }));
-      }
+      this._calendars = this._config!.entities.map((entity, idx) => ({
+        entity_id: entity,
+        backgroundColor: getColorByIndex(idx, computedStyles),
+      }));
     }
   }
 

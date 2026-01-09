@@ -49,7 +49,6 @@ export interface LovelaceBaseViewConfig {
   title?: string;
   path?: string;
   icon?: string;
-  show_icon_and_title?: boolean;
   theme?: string;
   panel?: boolean;
   background?: string | LovelaceViewBackgroundConfig;

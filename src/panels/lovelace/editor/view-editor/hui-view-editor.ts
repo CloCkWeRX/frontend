@@ -73,12 +73,6 @@ export class HuiViewEditor extends LitElement {
             icon: {},
           },
         },
-        {
-          name: "show_icon_and_title",
-          selector: {
-            boolean: {},
-          },
-        },
         { name: "path", selector: { text: {} } },
         { name: "theme", selector: { theme: {} } },
         {
@@ -213,7 +207,6 @@ export class HuiViewEditor extends LitElement {
       case "path":
         return this.hass!.localize("ui.panel.lovelace.editor.card.generic.url");
       case "type":
-      case "show_icon_and_title":
       case "subview":
       case "max_columns":
       case "dense_section_placement":
@@ -234,7 +227,6 @@ export class HuiViewEditor extends LitElement {
   ) => {
     switch (schema.name) {
       case "path":
-      case "show_icon_and_title":
       case "subview":
       case "dense_section_placement":
       case "top_margin":

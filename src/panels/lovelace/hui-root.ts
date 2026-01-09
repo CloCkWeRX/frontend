@@ -496,10 +496,6 @@ class HUIRoot extends LitElement {
 
     const tabs = html`<ha-tab-group @wa-tab-show=${this._handleViewSelected}>
       ${views.map((view, index) => {
-        const icon_and_title =
-          view.show_icon_and_title && view.icon && view.title;
-        const icon_only = view.icon && !icon_and_title;
-        const title_only = !icon_only && !icon_and_title;
         const hidden =
           !this._editMode && (view.subview || _isTabHiddenForUser(view));
         return html`
@@ -510,8 +506,7 @@ class HUIRoot extends LitElement {
             .disabled=${hidden}
             aria-label=${ifDefined(view.title)}
             class=${classMap({
-              "icon-only": Boolean(icon_only),
-              "icon-and-title": Boolean(icon_and_title),
+              icon: Boolean(view.icon),
               "hide-tab": Boolean(hidden),
             })}
           >
@@ -528,20 +523,18 @@ class HUIRoot extends LitElement {
                   ></ha-icon-button-arrow-prev>
                 `
               : nothing}
-            ${icon_only || icon_and_title
-              ? html`<ha-icon
-                  class=${classMap({
-                    "child-view-icon": Boolean(view.subview),
-                  })}
-                  title=${ifDefined(view.title)}
-                  .icon=${view.icon}
-                ></ha-icon>`
-              : nothing}
-            ${icon_and_title ? view.title : nothing}
-            ${title_only
-              ? view.title ||
-                this.hass.localize("ui.panel.lovelace.views.unnamed_view")
-              : nothing}
+            ${view.icon
+              ? html`
+                  <ha-icon
+                    class=${classMap({
+                      "child-view-icon": Boolean(view.subview),
+                    })}
+                    title=${ifDefined(view.title)}
+                    .icon=${view.icon}
+                  ></ha-icon>
+                `
+              : view.title ||
+                this.hass.localize("ui.panel.lovelace.views.unnamed_view")}
             ${this._editMode
               ? html`
                   <ha-icon-button
@@ -1496,27 +1489,24 @@ class HUIRoot extends LitElement {
         ha-tab-group-tab {
           --ha-tab-group-tab-height: var(--header-height, 56px);
         }
-        .tab-bar ha-tab-group-tab {
-          --ha-tab-group-tab-height: var(--tab-bar-height, 56px);
-        }
         ha-tab-group-tab[aria-selected="true"] .edit-icon {
           display: inline-flex;
         }
-
         ha-tab-group-tab::part(base) {
           padding-inline-start: var(--ha-tab-padding-start, var(--wa-space-l));
           padding-inline-end: var(--ha-tab-padding-end, var(--wa-space-l));
+        }
+        ha-tab-group-tab::part(base) {
           padding-top: calc((var(--ha-tab-group-tab-height) - 20px) / 2);
         }
-        ha-tab-group-tab.icon-only::part(base),
-        ha-tab-group-tab.icon-and-title::part(base) {
+        ha-tab-group-tab.icon::part(base) {
           padding-top: calc((var(--ha-tab-group-tab-height) - 20px) / 2 - 2px);
           padding-bottom: calc(
             (var(--ha-tab-group-tab-height) - 20px) / 2 - 4px
           );
         }
-        ha-tab-group-tab.icon-and-title ha-icon {
-          margin-inline-end: var(--ha-space-2);
+        .tab-bar ha-tab-group-tab {
+          --ha-tab-group-tab-height: var(--tab-bar-height, 56px);
         }
         .edit-mode ha-tab-group-tab[aria-selected="true"]::part(base) {
           padding: 0;

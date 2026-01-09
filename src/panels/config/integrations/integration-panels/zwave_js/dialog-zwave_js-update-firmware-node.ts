@@ -302,11 +302,10 @@ class DialogZWaveJSUpdateFirmwareNode extends LitElement {
                 </div>
                 ${this._updateFinishedMessage!.success
                   ? html`<p>
-                        ${this.hass.localize(
-                          `ui.panel.config.zwave_js.update_firmware.finished_status.done${localizationKeySuffix}`
-                        )}
-                      </p>
-                      ${closeButton}`
+                      ${this.hass.localize(
+                        `ui.panel.config.zwave_js.update_firmware.finished_status.done${localizationKeySuffix}`
+                      )}
+                    </p>`
                   : html`<p>
                         ${this.hass.localize(
                           "ui.panel.config.zwave_js.update_firmware.finished_status.try_again"

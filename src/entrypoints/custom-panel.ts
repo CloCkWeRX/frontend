@@ -28,7 +28,6 @@ window.loadES5Adapter = () => {
 };
 
 let panelEl: HTMLElement | undefined;
-let initialized = false;
 
 function setProperties(properties) {
   if (!panelEl) {
@@ -129,23 +128,13 @@ function initialize(
   });
 }
 
-function handleReady() {
-  if (initialized) return;
-  initialized = true;
-  window.parent.customPanel!.registerIframe(initialize, setProperties);
-}
+document.addEventListener(
+  "DOMContentLoaded",
+  () => window.parent.customPanel!.registerIframe(initialize, setProperties),
+  { once: true }
+);
 
-// Initial load
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", handleReady, { once: true });
-} else {
-  handleReady();
-}
-
-window.addEventListener("pageshow", handleReady);
-
-window.addEventListener("pagehide", () => {
-  initialized = false;
+window.addEventListener("unload", () => {
   // allow disconnected callback to fire
   while (document.body.lastChild) {
     document.body.removeChild(document.body.lastChild);

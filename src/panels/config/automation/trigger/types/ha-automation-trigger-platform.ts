@@ -4,6 +4,7 @@ import { css, html, LitElement, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators";
 import memoizeOne from "memoize-one";
 import { fireEvent } from "../../../../../common/dom/fire_event";
+import { computeDomain } from "../../../../../common/entity/compute_domain";
 import "../../../../../components/ha-checkbox";
 import "../../../../../components/ha-selector/ha-selector";
 import "../../../../../components/ha-settings-row";
@@ -304,11 +305,8 @@ export class HaPlatformTrigger extends LitElement {
       return undefined;
     }
 
-    const context: Record<string, any> = {};
+    const context = {};
     for (const [context_key, data_key] of Object.entries(field.context)) {
-      if (data_key === "target" && this.description?.target) {
-        context.target_selector = this._targetSelector(this.description.target);
-      }
       context[context_key] =
         data_key === "target"
           ? this.trigger.target
@@ -416,7 +414,7 @@ export class HaPlatformTrigger extends LitElement {
       return "";
     }
     return this.hass.localize(
-      `component.${getTriggerDomain(this.trigger.trigger)}.selector.${key}`
+      `component.${computeDomain(this.trigger.trigger)}.selector.${key}`
     );
   };
 

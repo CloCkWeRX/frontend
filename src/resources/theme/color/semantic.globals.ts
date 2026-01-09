@@ -156,9 +156,6 @@ export const semanticColorStyles = css`
     /* Surfaces */
     --ha-color-surface-default: var(--ha-color-neutral-95);
     --ha-color-on-surface-default: var(--ha-color-neutral-05);
-
-    /* Scrollable fade */
-    --ha-color-shadow-scrollable-fade: rgba(0, 0, 0, 0.08);
   }
 `;
 

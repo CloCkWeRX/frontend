@@ -124,6 +124,9 @@ export class HaIconPicker extends LitElement {
         .label=${this.label}
         .value=${this._value}
         .searchFn=${this._filterIcons}
+        .notFoundLabel=${this.hass?.localize(
+          "ui.components.icon-picker.no_match"
+        )}
         popover-placement="bottom-start"
         @value-changed=${this._valueChanged}
       >
@@ -168,6 +171,20 @@ export class HaIconPicker extends LitElement {
         } else if (keywords.some((word) => word.includes(normalizedFilter))) {
           rankedItems.push({ item, rank: 4 });
         }
+      }
+
+      // Allow preview for custom icon not in list
+      if (rankedItems.length === 0) {
+        rankedItems.push({
+          item: {
+            id: filter,
+            primary: filter,
+            icon: filter,
+            search_labels: { keyword: filter },
+            sorting_label: filter,
+          },
+          rank: 0,
+        });
       }
 
       return rankedItems
